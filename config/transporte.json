@@ -1,0 +1,6 @@
+{
+	"bus": 0.004,
+	"metro": 0.006,
+	"private car": 0.70,
+	"by foot": 0.29
+}

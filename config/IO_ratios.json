@@ -1,0 +1,19 @@
+{
+ "stay at home": 0.6, 
+ "private car": 0.8, 
+ "services": 0.6, 
+ "running": 1, 
+ "gym": 0.6,
+ "by foot": 1, 
+ "free time activities": 0.9, 
+ "school": 0.6, 
+ "extra activities": 1,
+ "agriculture": 1, 
+ "shopping": 0.7, 
+ "industry": 0.6, 
+ "bus": 0.8,
+ "metro": 0.5,
+ "university": 0.6,
+ "studying at the library": 0.6,
+ "construction": 0.9
+ }
