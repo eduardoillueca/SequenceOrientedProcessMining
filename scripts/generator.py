@@ -162,27 +162,27 @@ def create_popultaion(poblacion, indice_masa_corporal, incidencia_enfermagees_cr
     
     return data
 
-with open('/home/hopu/Descargas/PaperKarolinska/config/population.json') as file:
+with open('../config/population.json') as file:
     poblacion = json.load(file)
 
-with open('/home/hopu/Descargas/PaperKarolinska/config/icm.json') as file:
+with open('../config/icm.json') as file:
     indice_masa_corporal = json.load(file)
 
-with open('/home/hopu/Descargas/PaperKarolinska/config/incidencia.json') as file:
+with open('../config/incidencia.json') as file:
     incidencia_enfermagees_cronicas = json.load(file)
 
-with open('/home/hopu/Descargas/PaperKarolinska/config/empleo.json') as file:
+with open('../config/empleo.json') as file:
     employ = json.load(file)
 
-with open('/home/hopu/Descargas/PaperKarolinska/config/transporte.json') as file:
+with open('../config/transporte.json') as file:
     transport = json.load(file)
 
-with open('/home/hopu/Descargas/PaperKarolinska/config/tiempoLibre.json') as file:
+with open('../config/tiempoLibre.json') as file:
     freeTime = json.load(file)
     
-with open('/home/hopu/Descargas/PaperKarolinska/config/localizaciones_processed_IO.json') as file:
+with open('../config/localizaciones_processed_IO.json') as file:
     locations = json.load(file)
 
 data = create_popultaion(poblacion, indice_masa_corporal, incidencia_enfermagees_cronicas, employ, transport, freeTime, locations)
 
-data.to_csv('/home/hopu/Descargas/PaperKarolinska/data/population_data/sample_population_v3.csv')
+data.to_csv('../data/population_data/sample_population_v8.csv')

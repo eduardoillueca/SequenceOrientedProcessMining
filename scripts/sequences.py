@@ -97,7 +97,7 @@ def find_cell(domain, coordinates):
     return cell_id
 
     
-def process_sequence(s, citizen, locations, domain):
+def process_sequence(s, citizen, locations, domain, car = False):
     
     result = pd.DataFrame()
        
@@ -110,9 +110,7 @@ def process_sequence(s, citizen, locations, domain):
     residence_location = locations['features'][citizen.residence]['geometry']['coordinates']
     work_location = locations['features'][citizen.employ]['geometry']['coordinates']
     free_location = locations['features'][citizen.freeTime]['geometry']['coordinates']
-    
-    if residence_location == work_location:
-        print('OJO')
+
         
     residence_cell = find_cell(domain,residence_location)
     work_cell = find_cell(domain,work_location)
@@ -167,10 +165,15 @@ def process_sequence(s, citizen, locations, domain):
     
     for m in range(0,len(movements)):
         
+        if car:
+            velocity = 60
+        else:
+            velocity = 40
+            
         if movements == 'by foot':
             mu = (get_manhattan_distance(l[m],l[m+1])/5.7)*60 + random.randint(10,20)
         else:
-            mu = (get_manhattan_distance(l[m],l[m+1])/40)*60 + random.randint(10,20)
+            mu = (get_manhattan_distance(l[m],l[m+1])/velocity)*60 + random.randint(10,20)
         
         r = {'id': citizen.id,
              'cell_id': c[m]*100 + c[m+1],
@@ -220,7 +223,7 @@ def assign_timestamp(r):
         
         
         
-def generate_sequences(data, locations,domain):
+def generate_sequences(data, locations,domain, car = False):
     
     final_data = pd.DataFrame()
     
@@ -261,7 +264,7 @@ def generate_sequences(data, locations,domain):
                 s = f"stay at home-metro-{locations['features'][data.employ[i]]['properties']['type']}-metro-stay at home-metro-{locations['features'][data.freeTime[i]]['properties']['type']}-metro-stay at home"
                 
         
-        r = process_sequence(s, data.iloc[i,:], locations, domain)
+        r = process_sequence(s, data.iloc[i,:], locations, domain, car)
         r = r.dropna()
 
         r = assign_timestamp(r)
@@ -273,7 +276,7 @@ def generate_sequences(data, locations,domain):
         
         
 
-def assign_exposure(final_data, aq, RR, locations):
+def assign_exposure(final_data, aq, RR, locations, mask = False):
         
     concentration = []
     exposure = []
@@ -282,6 +285,7 @@ def assign_exposure(final_data, aq, RR, locations):
     
     aq.index = aq.hourId
     
+    print(final_data.columns)
     for i in final_data.index:
                 
         a = aq.loc[final_data.DateStart[i].hour:final_data.DateEnd[i].hour,:]
@@ -295,6 +299,9 @@ def assign_exposure(final_data, aq, RR, locations):
             concentration.append((a[a.cell_id == final_data.cell_id[i]]['PM2.5'].iloc[0])*IO)
         else:
             concentration.append((a[a.cell_id.isin([final_data.cell_id[i]//100,final_data.cell_id[i]%100])]['PM2.5'].mean())*IO)
+        
+        if mask and (final_data.Activity[i] in ['by foot', 'running', 'metro', 'agriculture', 'shopping', 'university', 'library']):
+            concentration[i] = concentration[i]/14.6
         
         exposure.append(concentration[i]*(final_data.Duration[i]/60))
         
@@ -325,26 +332,27 @@ def assign_exposure(final_data, aq, RR, locations):
     return final_data
 
 #### READ DATA ####
+
+if __name__ == "__main__":
+    aq = pd.read_csv('../data/aq_data/valencia_aq_gridded_v2.csv')
+    aq = aq[aq['dayId'] == '2018-03-01']
     
-aq = pd.read_csv('/home/hopu/Descargas/PaperKarolinska/data/aq_data/valencia_aq_gridded_v2.csv')
-aq = aq[aq['dayId'] == '2018-03-01']
-
-data = pd.read_csv('/home/hopu/Descargas/PaperKarolinska/data/population_data/sample_population_v3.csv')
-
-l = len(data['id'])
-
-with open('/home/hopu/Descargas/PaperKarolinska/config/valencia.json') as file:
-    domain = json.load(file)
-
-with open('/home/hopu/Descargas/PaperKarolinska/config/localizaciones_processed_IO.json') as file:
-    locations = json.load(file)
-  
-with open('/home/hopu/Descargas/PaperKarolinska/config/RR.json') as file:
-    RR = json.load(file)
-
-final_data = generate_sequences(data, locations, domain)
-final_data = assign_exposure(final_data, aq, RR, locations)
-
-final_data.to_csv('/home/hopu/Descargas/PaperKarolinska/data/sequence_data/sintetic_data_v6.csv')
+    data = pd.read_csv('../data/population_data/sample_population_v3.csv')
+    
+    l = len(data['id'])
+    
+    with open('../config/valencia.json') as file:
+        domain = json.load(file)
+    
+    with open('../config/localizaciones_processed_IO_residence.json') as file:
+        locations = json.load(file)
+      
+    with open('../config/RR.json') as file:
+        RR = json.load(file)
+    
+    final_data = generate_sequences(data, locations, domain, car = False)
+    final_data = assign_exposure(final_data, aq, RR, locations, mask = False)
+    
+    final_data.to_csv('../data/sequence_data/sintetic_data_v7_scenario5.csv')
 
 

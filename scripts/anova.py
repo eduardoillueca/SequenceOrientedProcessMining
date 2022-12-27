@@ -41,6 +41,7 @@ def plot_heatmap(post_hoc_res, groups):
 def anova_workflow(ecsv, target = 'EXPOSURE'):
     
     data = read_csv(ecsv)
+    data['RR'] = data['mortality relative risk']
     print(data.columns)
     print('######### ANOVA RESULTS #########')
     model = ols(f'{target} ~ Activity', data=data).fit()
@@ -52,11 +53,10 @@ def anova_workflow(ecsv, target = 'EXPOSURE'):
     post_hoc_res = comp.tukeyhsd()
     print(post_hoc_res.summary())
     
+
     plot_heatmap(post_hoc_res, groups = data['Activity'].unique())
-    
-    
     post_hoc_res.plot_simultaneous(ylabel= "Activity", xlabel= "Difference")
     
     return(post_hoc_res)
 
-rest = anova_workflow('D:\Karolinska_2\sintetic data\sintetic_data_v6.csv', target = 'RR')
+rest = anova_workflow('/home/hopu/Descargas/PaperKarolinska-main/data/sequence_data/sintetic_data_v6.csv', target = 'exposure')
