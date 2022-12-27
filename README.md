@@ -27,8 +27,11 @@ These are the activities performed by the citizens with the corresponding exposu
 There are four scripts
 
 **generator.py**: it takes as input the configuration files and generate the population for the study
+
 **sequences.py**: it takes as input the gridded air quality data and the population data. Then, it generates a csv with the sequence activities per citizens
+
 **KPI.py**: it takes as input the sequence activities and compute the KPIs, plotting them in a gauge diagram
+
 **anova.py**: it takes as input the sequence activities and compute the ANOVA analysis, with the corresponding plots.
 
 Note that the scenarios selection is done through *Interactive Process Mining*. The PMApp tool for this study is a software developed in a previous project, which is not open access, and should be requested to the authors.
